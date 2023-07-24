@@ -1,19 +1,18 @@
 #include "main.h"
+#include <stdio.h>
+#include <unistd.h>
 
 /**
- * _printf - Custom printf function
- * @format: The format string
+ * _printf - Print data to the standard output according to a format.
+ * @format: A character string containing zero or more directives.
  *
- * Return: The number of characters printed (excluding the null byte)
+ * Return: The number of characters printed (excluding the null byte used to
+ *         end output to strings), or -1 on error.
  */
 int _printf(const char *format, ...)
 {
 	va_list args;
-	int printed_chars = 0;
-	unsigned int i = 0;
-
-	if (!format || (format[0] == '%' && format[1] == '\0'))
-		return (-1);
+	int i = 0, printed_chars = 0;
 
 	va_start(args, format);
 
@@ -24,59 +23,29 @@ int _printf(const char *format, ...)
 			_putchar(format[i]);
 			printed_chars++;
 		}
-		else if (format[i + 1] == '%')
+		else if (format[i] == '%' && format[i + 1])
 		{
-			_putchar('%');
-			printed_chars++;
 			i++;
+			switch (format[i])
+			{
+				case 'c':
+					printed_chars += print_char(args);
+					break;
+				case 's':
+					printed_chars += print_string(args);
+					break;
+				case 'b':
+					printed_chars += print_binary(args);
+					break; // Don't forget to break after each case
+				default:
+					_putchar('%');
+					_putchar(format[i]);
+					printed_chars += 2;
+			}
 		}
-		else if (format[i + 1] == 'd' || format[i + 1] == 'i')
-		{
-			printed_chars += print_integer(va_arg(args, int));
-			i++;
-		}
-		else
-		{
-			_putchar('%');
-			printed_chars++;
-		}
-
 		i++;
 	}
 
 	va_end(args);
-
 	return (printed_chars);
 }
-
-/**
- * print_integer - Print an integer
- * @n: The integer to print
- *
- * Return: The number of characters printed
- */
-int print_integer(int n)
-{
-	unsigned int num;
-	int count = 0;
-
-	if (n < 0)
-	{
-		_putchar('-');
-		count++;
-		num = -n;
-	}
-	else
-	{
-		num = n;
-	}
-
-	if (num / 10)
-		count += print_integer(num / 10);
-
-	_putchar('0' + num % 10);
-	count++;
-
-	return (count);
-}
-
