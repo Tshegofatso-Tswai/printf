@@ -1,64 +1,88 @@
 #include "main.h"
-#include <unistd.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 /**
- * _printf - Produces output according to a format.
- * @format: A character string containing directives.
+ * _printf - Custom implementation of printf function
+ * @format: The format string containing directives
  *
- * Return: The number of characters printed (excluding the null byte).
+ * Return: The number of characters printed (excluding the null byte)
  */
 int _printf(const char *format, ...)
 {
-	va_list args;
-	int count = 0;
-	char *str_arg;
-	char ch;
+    va_list args;
+    int len = 0;
+    int printed_chars = 0;
+    char ch;
 
-	va_start(args, format);
+    if (format == NULL)
+        return (-1);
 
-	while (*format != '\0')
-	{
-		if (*format != '%')
-		{
-			write(1, format, 1);
-			count++;
-		}
-		else
-		{
-			format++;
-			switch (*format)
-			{
-				case 'c':
-					ch = va_arg(args, int);
-					write(1, &ch, 1);
-					count++;
-					break;
-				case 's':
-					str_arg = va_arg(args, char *);
-					if (str_arg == NULL)
-						str_arg = "(null)";
-					while (*str_arg != '\0')
-					{
-						write(1, str_arg, 1);
-						str_arg++;
-						count++;
-					}
-					break;
-				case '%':
-					write(1, "%", 1);
-					count++;
-					break;
-				default:
-					write(1, format - 1, 2);
-					count += 2;
-					break;
-			}
-		}
-		format++;
-	}
+    va_start(args, format);
 
-	va_end(args);
+    for (len = 0; format[len] != '\0'; len++)
+    {
+        if (format[len] != '%')
+        {
+            putchar(format[len]);
+            printed_chars++;
+        }
+        else
+        {
+            len++;
+            ch = format[len];
+            switch (ch)
+            {
+                case 'c':
+                    putchar(va_arg(args, int));
+                    printed_chars++;
+                    break;
 
-	return (count);
+                case 's':
+                    printed_chars += print_string(va_arg(args, char *));
+                    break;
+
+                case '%':
+                    putchar('%');
+                    printed_chars++;
+                    break;
+
+                default:
+                    putchar('%');
+                    putchar(ch);
+                    printed_chars += 2;
+                    break;
+            }
+        }
+    }
+
+    va_end(args);
+
+    return (printed_chars);
+}
+
+/**
+ * print_string - Helper function to print a string
+ * @str: The string to print
+ *
+ * Return: The number of characters printed
+ */
+int print_string(char *str)
+{
+    int len = 0;
+
+    if (str == NULL)
+    {
+        str = "(null)";
+    }
+
+    while (*str != '\0')
+    {
+        putchar(*str);
+        str++;
+        len++;
+    }
+
+    return (len);
 }
 
