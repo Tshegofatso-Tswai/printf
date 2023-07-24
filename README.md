@@ -1,6 +1,6 @@
 # printf Project
 
-This is a group project completed By Tshegofatso Tswai and Thabiso Aphane. The goal of this project is to write our own version of the `printf` function in C. The `printf` function is used to produce formatted output to the standard output stream (stdout).
+This is a group project that is completed By Tshegofatso Tswai and Thabiso Aphane. The goal of this project is to write our own version of the `printf` function in C. The `printf` function is used to produce formatted output to the standard output stream (stdout).
 
 ## Tasks
 
