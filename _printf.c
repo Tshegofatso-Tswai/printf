@@ -1,51 +1,64 @@
 #include "main.h"
-#include <stdio.h>
-#include <unistd.h>
+#include <stdarg.h>
+#include <unistd.h> /* for write */
 
 /**
- * _printf - Print data to the standard output according to a format.
- * @format: A character string containing zero or more directives.
+ * _printf - Produces output according to a format.
+ * @format: A character string containing directives.
  *
- * Return: The number of characters printed (excluding the null byte used to
- *         end output to strings), or -1 on error.
+ * Return: The number of characters printed (excluding the null byte).
  */
 int _printf(const char *format, ...)
 {
 	va_list args;
-	int i = 0, printed_chars = 0;
+	int count = 0;
+	char *str_arg;
+	char ch;
 
 	va_start(args, format);
 
-	while (format && format[i])
+	while (*format != '\0')
 	{
-		if (format[i] != '%')
+		if (*format != '%')
 		{
-			_putchar(format[i]);
-			printed_chars++;
+			write(1, format, 1);
+			count++;
 		}
-		else if (format[i] == '%' && format[i + 1])
+		else
 		{
-			i++;
-			switch (format[i])
+			format++;
+			switch (*format)
 			{
 				case 'c':
-					printed_chars += print_char(args);
+					ch = va_arg(args, int);
+					write(1, &ch, 1);
+					count++;
 					break;
 				case 's':
-					printed_chars += print_string(args);
+					str_arg = va_arg(args, char *);
+					if (str_arg == NULL)
+						str_arg = "(null)";
+					while (*str_arg != '\0')
+					{
+						write(1, str_arg, 1);
+						str_arg++;
+						count++;
+					}
 					break;
-				case 'b':
-					printed_chars += print_binary(args);
-					break; // Don't forget to break after each case
+				case '%':
+					write(1, "%", 1);
+					count++;
+					break;
 				default:
-					_putchar('%');
-					_putchar(format[i]);
-					printed_chars += 2;
+					write(1, format - 1, 2);
+					count += 2;
+					break;
 			}
 		}
-		i++;
+		format++;
 	}
 
 	va_end(args);
-	return (printed_chars);
+
+	return (count);
 }
