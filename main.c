@@ -1,11 +1,13 @@
 #include "main.h"
 
+/**
+ * main - Entry point
+ *
+ * Return: Always 0
+ */
 int main(void)
 {
-    int len;
-
-    len = _printf("Hello, %s!\n", "World");
-    _printf("Number of characters printed: %d\n", len);
-
+    _printf("Hello, world!\n");
     return (0);
 }
+

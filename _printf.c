@@ -1,82 +1,59 @@
 #include "main.h"
+#include <stddef.h>
 
 /**
  * _printf - Custom printf function
  * @format: The format string
  *
- * Return: The number of characters printed (excluding the null byte)
+ * Return: The number of characters printed
  */
 int _printf(const char *format, ...)
 {
-	va_list args;
-	int printed_chars = 0;
-	unsigned int i = 0;
+    int i = 0, j = 0, printed_chars = 0;
+    va_list args;
+    format_func_t formats[] = {
+        {'c', print_char},
+        {'s', print_string},
+        {'b', print_binary}, /* Custom conversion specifier for binary */
+        {'\0', NULL}
+    };
 
-	if (!format || (format[0] == '%' && format[1] == '\0'))
-		return (-1);
+    if (format == NULL)
+        return (-1);
 
-	va_start(args, format);
+    va_start(args, format);
 
-	while (format && format[i])
-	{
-		if (format[i] != '%')
-		{
-			_putchar(format[i]);
-			printed_chars++;
-		}
-		else if (format[i + 1] == '%')
-		{
-			_putchar('%');
-			printed_chars++;
-			i++;
-		}
-		else if (format[i + 1] == 'd' || format[i + 1] == 'i')
-		{
-			printed_chars += print_integer(va_arg(args, int));
-			i++;
-		}
-		else
-		{
-			_putchar('%');
-			printed_chars++;
-		}
+    while (format[i] != '\0')
+    {
+        if (format[i] != '%')
+        {
+            _putchar(format[i]);
+            printed_chars++;
+        }
+        else if (format[i] == '%' && format[i + 1] == '%')
+        {
+            _putchar('%');
+            printed_chars++;
+            i++;
+        }
+        else
+        {
+            j = 0;
+            while (formats[j].type != '\0')
+            {
+                if (formats[j].type == format[i + 1])
+                {
+                    printed_chars += formats[j].func(args);
+                    break;
+                }
+                j++;
+            }
+            i++;
+        }
+        i++;
+    }
 
-		i++;
-	}
-
-	va_end(args);
-
-	return (printed_chars);
-}
-
-/**
- * print_integer - Print an integer
- * @n: The integer to print
- *
- * Return: The number of characters printed
- */
-int print_integer(int n)
-{
-	unsigned int num;
-	int count = 0;
-
-	if (n < 0)
-	{
-		_putchar('-');
-		count++;
-		num = -n;
-	}
-	else
-	{
-		num = n;
-	}
-
-	if (num / 10)
-		count += print_integer(num / 10);
-
-	_putchar('0' + num % 10);
-	count++;
-
-	return (count);
+    va_end(args);
+    return (printed_chars);
 }
 
